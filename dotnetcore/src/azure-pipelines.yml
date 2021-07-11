@@ -1,0 +1,70 @@
+trigger:
+- main
+- feature/*
+
+pool:
+  vmImage: windows-latest
+
+variables:
+  BuildPlatform: 'Any CPU'
+  BuildConfiguration: 'Release'
+
+jobs:
+  - job: build
+    steps:    
+      - task: DotNetCoreCLI@2
+        displayName: Restore
+        inputs:
+          command: restore
+          projects:  |
+            **\*.csproj
+
+      - task: DotNetCoreCLI@2
+        displayName: Build
+        inputs:
+          projects:  |
+            **\*.csproj
+            arguments: '--configuration $(BuildConfiguration)'
+
+      - task: DotNetCoreCLI@2
+        displayName: Test
+        inputs:
+          command: test
+          projects: '**/*[Tt]ests/*.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+
+      - task: DotNetCoreCLI@2
+        displayName: Publish
+        inputs:
+          command: publish
+          publishWebProjects: True
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          zipAfterPublish: True
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact'
+        inputs:
+          PathtoPublish: '$(build.artifactstagingdirectory)'
+        condition: succeededOrFailed()
+
+
+  - deployment: 
+    displayName: Azure Web App Deployment
+    environment: develop
+    dependsOn: build
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: DownloadBuildArtifacts@0
+              inputs:
+                buildType: 'current'
+                downloadType: 'single'
+                artifactName: 'drop'
+                downloadPath: '$(System.ArtifactsDirectory)'
+            
+            - task: AzureWebApp@1
+              inputs:
+                azureSubscription: 'AzureServiceConnection'
+                appName: 'wa-udp-dotnetcore-windows'
+                package: $(System.ArtifactsDirectory)/**/*.zip

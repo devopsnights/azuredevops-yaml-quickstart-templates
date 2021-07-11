@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnetcoreApp", "dotnetcoreApp\dotnetcoreApp.csproj", "{9295975A-56C3-4A17-AC4A-64CA419EECFF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9295975A-56C3-4A17-AC4A-64CA419EECFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9295975A-56C3-4A17-AC4A-64CA419EECFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9295975A-56C3-4A17-AC4A-64CA419EECFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9295975A-56C3-4A17-AC4A-64CA419EECFF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CEC53890-405B-499F-A7BF-37E4A8600423}
+	EndGlobalSection
+EndGlobal
