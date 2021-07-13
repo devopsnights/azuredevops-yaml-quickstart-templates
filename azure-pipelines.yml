@@ -12,7 +12,7 @@ variables:
 stages:
   - stage: build
     jobs:
-      - job: build sql project
+      - job: sql
         steps:    
           - task: VSBuild@1
             inputs:
