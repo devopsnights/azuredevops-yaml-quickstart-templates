@@ -35,6 +35,9 @@ stages:
           runOnce:
             deploy:
               steps:    
+                - powershell:
+                    Get-ChildItem $(Pipeline.Workspace) -Recurse
+                    
                 - task: SqlAzureDacpacDeployment@1
                   inputs:
                     azureSubscription: 'AzureServiceConnection'
@@ -45,5 +48,5 @@ stages:
                     SqlPassword: '$(sqlPassword)'
                     deployType: 'DacpacTask'
                     DeploymentAction: 'Publish'
-                    DacpacFile: '$(Pipeline.Workspace)/sql-template.dacpac'
+                    DacpacFile: '$(Pipeline.Workspace)/drop/sql-template.dacpac'
                     IpDetectionMethod: 'AutoDetect'
