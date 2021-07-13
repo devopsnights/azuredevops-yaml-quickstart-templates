@@ -26,16 +26,24 @@ jobs:
         inputs:
           PathtoPublish: '$(build.artifactstagingdirectory)'
         condition: succeededOrFailed()
-      
-      - task: SqlAzureDacpacDeployment@1
-        inputs:
-          azureSubscription: 'AzureServiceConnection'
-          AuthenticationType: 'server'
-          ServerName: 'sql-udp.database.windows.net'
-          DatabaseName: 'sqludp'
-          SqlUsername: 'wesley'
-          SqlPassword: '$(sqlPassword)'
-          deployType: 'DacpacTask'
-          DeploymentAction: 'Publish'
-          DacpacFile: '$(build.artifactstagingdirectory)/sql-template.dacpac'
-          IpDetectionMethod: 'AutoDetect'
+  
+  - deployment: 
+    displayName: Azure Web App Deployment
+    environment: develop
+    dependsOn: build
+    strategy:
+      runOnce:
+        deploy:
+          steps:    
+            - task: SqlAzureDacpacDeployment@1
+              inputs:
+                azureSubscription: 'AzureServiceConnection'
+                AuthenticationType: 'server'
+                ServerName: 'sql-udp.database.windows.net'
+                DatabaseName: 'sqludp'
+                SqlUsername: 'wesley'
+                SqlPassword: '$(sqlPassword)'
+                deployType: 'DacpacTask'
+                DeploymentAction: 'Publish'
+                DacpacFile: '$(build.artifactstagingdirectory)/sql-template.dacpac'
+                IpDetectionMethod: 'AutoDetect'
