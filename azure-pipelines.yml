@@ -9,37 +9,41 @@ variables:
   BuildPlatform: 'Any CPU'
   BuildConfiguration: 'Release'
 
-jobs:
-  - job: build
-    steps:    
-      - task: VSBuild@1
-        inputs:
-          solution: '**\sql\**\*.sln'
-          msbuildArgs: '/p:OutDir=$(Pipeline.Workspace)'
+stages:
+  - stage: build
+    jobs:
+      - job: build sql project
+        steps:    
+          - task: VSBuild@1
+            inputs:
+              solution: '**\sql\**\*.sln'
+              msbuildArgs: '/p:OutDir=$(Pipeline.Workspace)'
 
-      - task: PublishPipelineArtifact@1
-        inputs:
-          targetPath: '$(Pipeline.Workspace)'
-          artifact: 'drop'
-          publishLocation: 'pipeline'
-  
-  - deployment: 
-    displayName: azure sql deployment
-    environment: develop
-    dependsOn: build
-    strategy:
-      runOnce:
-        deploy:
-          steps:    
-            - task: SqlAzureDacpacDeployment@1
-              inputs:
-                azureSubscription: 'AzureServiceConnection'
-                AuthenticationType: 'server'
-                ServerName: 'sql-udp.database.windows.net'
-                DatabaseName: 'sqludp'
-                SqlUsername: 'wesley'
-                SqlPassword: '$(sqlPassword)'
-                deployType: 'DacpacTask'
-                DeploymentAction: 'Publish'
-                DacpacFile: '$(Pipeline.Workspace)/sql-template.dacpac'
-                IpDetectionMethod: 'AutoDetect'
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: '$(Pipeline.Workspace)'
+              artifact: 'drop'
+              publishLocation: 'pipeline'
+      
+  - stage: deploy
+    jobs:
+      - deployment: develop deploy
+        displayName: azure sql deployment
+        environment: develop
+        dependsOn: build
+        strategy:
+          runOnce:
+            deploy:
+              steps:    
+                - task: SqlAzureDacpacDeployment@1
+                  inputs:
+                    azureSubscription: 'AzureServiceConnection'
+                    AuthenticationType: 'server'
+                    ServerName: 'sql-udp.database.windows.net'
+                    DatabaseName: 'sqludp'
+                    SqlUsername: 'wesley'
+                    SqlPassword: '$(sqlPassword)'
+                    deployType: 'DacpacTask'
+                    DeploymentAction: 'Publish'
+                    DacpacFile: '$(Pipeline.Workspace)/sql-template.dacpac'
+                    IpDetectionMethod: 'AutoDetect'
