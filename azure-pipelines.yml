@@ -12,10 +12,6 @@ variables:
 jobs:
   - job: build
     steps:    
-      - script: sqlpackage.exe /version
-        workingDirectory: C:\Program Files\Microsoft SQL Server\150\DAC\bin\
-        displayName: 'get sqlpackage version'
-      
       - task: VSBuild@1
         inputs:
           solution: '**\sql\**\*.sln'
@@ -26,11 +22,6 @@ jobs:
           targetPath: '$(Pipeline.Workspace)'
           artifact: 'drop'
           publishLocation: 'pipeline'
-      # - task: PublishBuildArtifacts@1
-      #   displayName: 'Publish Artifact'
-      #   inputs:
-      #     PathtoPublish: '$(build.artifactstagingdirectory)'
-      #   condition: succeededOrFailed()
   
   - deployment: 
     displayName: azure sql deployment
