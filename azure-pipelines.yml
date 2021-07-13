@@ -34,10 +34,7 @@ stages:
         strategy:
           runOnce:
             deploy:
-              steps:    
-                - powershell:
-                    Get-ChildItem $(Pipeline.Workspace) -Recurse
-                    
+              steps:
                 - task: SqlAzureDacpacDeployment@1
                   inputs:
                     azureSubscription: 'AzureServiceConnection'
