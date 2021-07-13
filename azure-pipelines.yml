@@ -19,13 +19,18 @@ jobs:
       - task: VSBuild@1
         inputs:
           solution: '**\sql\**\*.sln'
-          msbuildArgs: '/p:OutDir=$(build.artifactstagingdirectory)'
+          msbuildArgs: '/p:OutDir=$(Pipeline.Workspace)'
 
-      - task: PublishBuildArtifacts@1
-        displayName: 'Publish Artifact'
+      - task: PublishPipelineArtifact@1
         inputs:
-          PathtoPublish: '$(build.artifactstagingdirectory)'
-        condition: succeededOrFailed()
+          targetPath: '$(Pipeline.Workspace)'
+          artifact: 'drop'
+          publishLocation: 'pipeline'
+      # - task: PublishBuildArtifacts@1
+      #   displayName: 'Publish Artifact'
+      #   inputs:
+      #     PathtoPublish: '$(build.artifactstagingdirectory)'
+      #   condition: succeededOrFailed()
   
   - deployment: 
     displayName: azure sql deployment
