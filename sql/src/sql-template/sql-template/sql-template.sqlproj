@@ -98,5 +98,6 @@
     <Build Include="dbo\User Defined Types\Phone.sql" />
     <Build Include="Security\SalesLT.sql" />
     <Build Include="SalesLT\Sequences\SalesOrderNumber.sql" />
+    <Build Include="SalesLT\Tables\Customer2.sql" />
   </ItemGroup>
 </Project>
