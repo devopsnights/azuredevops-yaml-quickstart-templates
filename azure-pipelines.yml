@@ -18,7 +18,7 @@ jobs:
       
       - task: VSBuild@1
         inputs:
-          solution: '**\*.sln'
+          solution: '**\sql\**\*.sln'
           msbuildArgs: '/p:OutDir=$(build.artifactstagingdirectory)'
 
       # - task: DotNetCoreCLI@2
