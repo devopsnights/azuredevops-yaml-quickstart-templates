@@ -28,7 +28,7 @@ jobs:
         condition: succeededOrFailed()
   
   - deployment: 
-    displayName: Azure Web App Deployment
+    displayName: azure sql deployment
     environment: develop
     dependsOn: build
     strategy:
