@@ -1,4 +1,4 @@
-CREATE TABLE [SalesLT].[CustomerAddress] (
+﻿CREATE TABLE [SalesLT].[CustomerAddress] (
     [CustomerID]   INT              NOT NULL,
     [AddressID]    INT              NOT NULL,
     [AddressType]  [dbo].[Name]     NOT NULL,
@@ -9,7 +9,4 @@ CREATE TABLE [SalesLT].[CustomerAddress] (
     CONSTRAINT [FK_CustomerAddress_Customer_CustomerID] FOREIGN KEY ([CustomerID]) REFERENCES [SalesLT].[Customer] ([CustomerID]),
     CONSTRAINT [AK_CustomerAddress_rowguid] UNIQUE NONCLUSTERED ([rowguid] ASC)
 );
-
-
-GO
 

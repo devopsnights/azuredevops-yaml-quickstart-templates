@@ -1,4 +1,4 @@
-CREATE TABLE [dbo].[ErrorLog] (
+﻿CREATE TABLE [dbo].[ErrorLog] (
     [ErrorLogID]     INT             IDENTITY (1, 1) NOT NULL,
     [ErrorTime]      DATETIME        CONSTRAINT [DF_ErrorLog_ErrorTime] DEFAULT (getdate()) NOT NULL,
     [UserName]       [sysname]       NOT NULL,
@@ -10,7 +10,4 @@ CREATE TABLE [dbo].[ErrorLog] (
     [ErrorMessage]   NVARCHAR (4000) NOT NULL,
     CONSTRAINT [PK_ErrorLog_ErrorLogID] PRIMARY KEY CLUSTERED ([ErrorLogID] ASC)
 );
-
-
-GO
 

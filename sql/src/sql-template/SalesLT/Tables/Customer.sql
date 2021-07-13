@@ -1,4 +1,4 @@
-CREATE TABLE [SalesLT].[Customer] (
+﻿CREATE TABLE [SalesLT].[Customer] (
     [CustomerID]   INT               IDENTITY (1, 1) NOT NULL,
     [NameStyle]    [dbo].[NameStyle] CONSTRAINT [DF_Customer_NameStyle] DEFAULT ((0)) NOT NULL,
     [Title]        NVARCHAR (8)      NULL,
@@ -20,10 +20,6 @@ CREATE TABLE [SalesLT].[Customer] (
 
 
 GO
-
 CREATE NONCLUSTERED INDEX [IX_Customer_EmailAddress]
     ON [SalesLT].[Customer]([EmailAddress] ASC);
-
-
-GO
 

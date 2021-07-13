@@ -1,4 +1,4 @@
-CREATE FUNCTION [dbo].[ufnGetAllCategories]()
+﻿CREATE FUNCTION [dbo].[ufnGetAllCategories]()
 RETURNS @retCategoryInformation TABLE
 (
     -- Columns returned by the function
@@ -29,6 +29,3 @@ BEGIN
     ON PC.[ProductCategoryID] = CCTE.[ParentProductCategoryID];
     RETURN;
 END;
-
-GO
-

@@ -1,4 +1,4 @@
-CREATE VIEW [SalesLT].[vProductModelCatalogDescription]
+﻿CREATE VIEW [SalesLT].[vProductModelCatalogDescription]
 AS
 SELECT
     [ProductModelID]
@@ -59,6 +59,3 @@ SELECT
     ,[ModifiedDate]
 FROM [SalesLT].[ProductModel]
 WHERE [CatalogDescription] IS NOT NULL;
-
-GO
-

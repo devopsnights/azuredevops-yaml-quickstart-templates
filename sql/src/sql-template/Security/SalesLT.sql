@@ -1,6 +1,3 @@
-CREATE SCHEMA [SalesLT]
+﻿CREATE SCHEMA [SalesLT]
     AUTHORIZATION [dbo];
-
-
-GO
 

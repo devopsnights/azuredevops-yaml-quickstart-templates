@@ -1,4 +1,4 @@
-CREATE VIEW [SalesLT].[vGetAllCategories]
+﻿CREATE VIEW [SalesLT].[vGetAllCategories]
 WITH SCHEMABINDING
 AS
 -- Returns the CustomerID, first name, and last name for the specified customer.
@@ -19,6 +19,3 @@ SELECT PC.[Name] AS [ParentProductCategoryName], CCTE.[Name] as [ProductCategory
 FROM CategoryCTE AS CCTE
 JOIN SalesLT.ProductCategory AS PC
 ON PC.[ProductCategoryID] = CCTE.[ParentProductCategoryID]
-
-GO
-

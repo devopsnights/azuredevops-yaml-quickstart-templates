@@ -23,7 +23,7 @@ jobs:
         displayName: Build
         inputs:
           projects:  |
-            **\*.sqlproj
+            **\*.csproj
             arguments: '--configuration $(BuildConfiguration)'
 
       - task: DotNetCoreCLI@2

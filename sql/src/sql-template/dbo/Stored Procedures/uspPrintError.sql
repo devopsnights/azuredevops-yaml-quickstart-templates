@@ -1,4 +1,4 @@
-
+﻿
 -- uspPrintError prints error information about the error that caused
 -- execution to jump to the CATCH block of a TRY...CATCH construct.
 -- Should be executed from within the scope of a CATCH block otherwise
@@ -16,6 +16,3 @@ BEGIN
           ', Line ' + CONVERT(varchar(5), ERROR_LINE());
     PRINT ERROR_MESSAGE();
 END;
-
-GO
-

@@ -1,4 +1,4 @@
-CREATE TABLE [SalesLT].[SalesOrderDetail] (
+﻿CREATE TABLE [SalesLT].[SalesOrderDetail] (
     [SalesOrderID]       INT              NOT NULL,
     [SalesOrderDetailID] INT              IDENTITY (1, 1) NOT NULL,
     [OrderQty]           SMALLINT         NOT NULL,
@@ -19,10 +19,6 @@ CREATE TABLE [SalesLT].[SalesOrderDetail] (
 
 
 GO
-
 CREATE NONCLUSTERED INDEX [IX_SalesOrderDetail_ProductID]
     ON [SalesLT].[SalesOrderDetail]([ProductID] ASC);
-
-
-GO
 

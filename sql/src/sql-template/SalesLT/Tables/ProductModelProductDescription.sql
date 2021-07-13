@@ -1,4 +1,4 @@
-CREATE TABLE [SalesLT].[ProductModelProductDescription] (
+﻿CREATE TABLE [SalesLT].[ProductModelProductDescription] (
     [ProductModelID]       INT              NOT NULL,
     [ProductDescriptionID] INT              NOT NULL,
     [Culture]              NCHAR (6)        NOT NULL,
@@ -9,7 +9,4 @@ CREATE TABLE [SalesLT].[ProductModelProductDescription] (
     CONSTRAINT [FK_ProductModelProductDescription_ProductModel_ProductModelID] FOREIGN KEY ([ProductModelID]) REFERENCES [SalesLT].[ProductModel] ([ProductModelID]),
     CONSTRAINT [AK_ProductModelProductDescription_rowguid] UNIQUE NONCLUSTERED ([rowguid] ASC)
 );
-
-
-GO
 

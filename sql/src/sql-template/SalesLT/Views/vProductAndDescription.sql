@@ -1,4 +1,4 @@
-CREATE VIEW [SalesLT].[vProductAndDescription]
+﻿CREATE VIEW [SalesLT].[vProductAndDescription]
 WITH SCHEMABINDING
 AS
 -- View (indexed or standard) to display products and product descriptions by language.
@@ -17,10 +17,6 @@ FROM [SalesLT].[Product] p
     ON pmx.[ProductDescriptionID] = pd.[ProductDescriptionID];
 
 GO
-
 CREATE UNIQUE CLUSTERED INDEX [IX_vProductAndDescription]
     ON [SalesLT].[vProductAndDescription]([Culture] ASC, [ProductID] ASC);
-
-
-GO
 

@@ -1,4 +1,4 @@
-
+﻿
 -- uspLogError logs error information in the ErrorLog table about the
 -- error that caused execution to jump to the CATCH block of a
 -- TRY...CATCH construct. This should be executed from within the scope
@@ -59,6 +59,3 @@ BEGIN
         RETURN -1;
     END CATCH
 END;
-
-GO
-

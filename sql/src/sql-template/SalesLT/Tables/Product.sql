@@ -1,4 +1,4 @@
-CREATE TABLE [SalesLT].[Product] (
+﻿CREATE TABLE [SalesLT].[Product] (
     [ProductID]              INT              IDENTITY (1, 1) NOT NULL,
     [Name]                   [dbo].[Name]     NOT NULL,
     [ProductNumber]          NVARCHAR (25)    NOT NULL,
@@ -27,7 +27,4 @@ CREATE TABLE [SalesLT].[Product] (
     CONSTRAINT [AK_Product_ProductNumber] UNIQUE NONCLUSTERED ([ProductNumber] ASC),
     CONSTRAINT [AK_Product_rowguid] UNIQUE NONCLUSTERED ([rowguid] ASC)
 );
-
-
-GO
 
