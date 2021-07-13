@@ -41,5 +41,5 @@ jobs:
                 SqlPassword: '$(sqlPassword)'
                 deployType: 'DacpacTask'
                 DeploymentAction: 'Publish'
-                DacpacFile: '$(build.artifactstagingdirectory)/sql-template.dacpac'
+                DacpacFile: '$(Pipeline.Workspace)/sql-template.dacpac'
                 IpDetectionMethod: 'AutoDetect'
