@@ -32,7 +32,7 @@ jobs:
           azureSubscription: 'AzureServiceConnection'
           AuthenticationType: 'server'
           ServerName: 'sql-udp.database.windows.net'
-          DatabaseName: 'sql-udp'
+          DatabaseName: 'sqludp'
           SqlUsername: 'wesley'
           SqlPassword: '$(sqlPassword)'
           deployType: 'DacpacTask'
