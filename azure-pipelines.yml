@@ -26,11 +26,11 @@ stages:
               publishLocation: 'pipeline'
       
   - stage: deploy
+    dependsOn: build
     jobs:
-      - deployment: develop deploy
+      - deployment: develop
         displayName: azure sql deployment
         environment: develop
-        dependsOn: build
         strategy:
           runOnce:
             deploy:
