@@ -38,9 +38,11 @@ stages:
                 - task: SqlAzureDacpacDeployment@1
                   inputs:
                     azureSubscription: 'AzureServiceConnection'
-                    AuthenticationType: 'servicePrincipal'
+                    AuthenticationType: 'server'
                     ServerName: 'sql-udp.database.windows.net'
                     DatabaseName: 'sqludp'
+                    SqlUsername: 'wesley'
+                    SqlPassword: '$(sqlPassword)'
                     deployType: 'DacpacTask'
                     DeploymentAction: 'Publish'
                     DacpacFile: '$(Pipeline.Workspace)/drop/sql-template.dacpac'
