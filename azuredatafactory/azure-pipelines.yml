@@ -73,13 +73,13 @@ stages:
             publishLocation: 'pipeline'
 
   - stage: 'development'
-    displayName: 'Deploy Changes to Production'
+    displayName: 'Deploy Changes to development'
     dependsOn: build
     jobs: 
-    - deployment: DeployToProduction
+    - deployment: DeployToDevelopment
       pool:
         vmImage: 'vs2017-win2016'
-      environment: Production 
+      environment: development 
       strategy:
         runOnce:
           deploy:
