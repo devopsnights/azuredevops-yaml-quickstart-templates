@@ -108,7 +108,7 @@ stages:
 
   - stage: 'uat'
     displayName: 'UAT deploy'
-    dependsOn: build
+    dependsOn: development
     variables:
       dataFactoryName: adf-uat-development
     jobs: 
