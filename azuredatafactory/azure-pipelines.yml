@@ -45,10 +45,17 @@ stages:
             workingDir: '$(workingDir)'
           displayName: 'Validate and Generate ARM template'
 
+        - task: CopyFiles@2
+          inputs:
+            SourceFolder: '$(workingDir)/artifacts'
+            Contents: '**'
+            TargetFolder: '$(build.artifactstagingdirectory)/artifacts' 
+          displayName: 'Copying application artifact'
+
         - task: PublishPipelineArtifact@1
           inputs:
-            targetPath: '$(Build.Repository.LocalPath)/ArmTemplate'
-            artifact: 'ArmTemplates'
+            targetPath: '$(build.artifactstagingdirectory)'
+            artifact: 'datafactory'
             publishLocation: 'pipeline'
 
   # - stage: 'development'
