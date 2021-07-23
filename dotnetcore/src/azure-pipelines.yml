@@ -1,6 +1,11 @@
 trigger:
-- main
-- feature/*
+  branches:
+    include:
+    - feature/*
+    - master
+  paths:
+    include:
+    - dotnetcore
 
 pool:
   vmImage: windows-latest

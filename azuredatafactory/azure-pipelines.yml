@@ -93,7 +93,7 @@ stages:
                   resourceGroupName: "RG-Datafactory"
                   location: "northeurope"
                   templateLocation: "Linked artifact"
-                  csmFile: '$(Pipeline.Workspace)\infrastructure\datafactory.json'
+                  csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
                   deploymentMode: "Incremental"
                   deploymentOutputs: "ArmOutputs"
                   overrideParameters:
