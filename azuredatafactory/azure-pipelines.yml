@@ -28,13 +28,13 @@ stages:
         - task: Npm@1
           inputs:
             command: 'custom'
-            customCommand: 'run build validate $(Build.Repository.LocalPath) /subscriptions/337ba254-3aa0-4551-ba8e-89debefaa373/resourceGroups/RG-Datafactory/providers/Microsoft.DataFactory/factories/adf-testdeploywes'
+            customCommand: 'run build validate $(Build.Repository.LocalPath)/azuredatafactory/src /subscriptions/337ba254-3aa0-4551-ba8e-89debefaa373/resourceGroups/RG-Datafactory/providers/Microsoft.DataFactory/factories/adf-testdeploywes'
           displayName: 'Validate'
 
         - task: Npm@1
           inputs:
             command: 'custom'
-            customCommand: 'run build export $(Build.Repository.LocalPath) /subscriptions/337ba254-3aa0-4551-ba8e-89debefaa373/resourceGroups/RG-Datafactory/providers/Microsoft.DataFactory/factories/adf-testdeploywes ArmTemplate'
+            customCommand: 'run build export $(Build.Repository.LocalPath)/azuredatafactory/src /subscriptions/337ba254-3aa0-4551-ba8e-89debefaa373/resourceGroups/RG-Datafactory/providers/Microsoft.DataFactory/factories/adf-testdeploywes ArmTemplate'
           displayName: 'Validate and Generate ARM template'
 
         - task: PublishPipelineArtifact@1
