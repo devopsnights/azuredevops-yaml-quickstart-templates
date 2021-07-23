@@ -75,6 +75,8 @@ stages:
   - stage: 'development'
     displayName: 'Deploy Changes to development'
     dependsOn: build
+    variables:
+      dataFactoryName: adf-udp-development
     jobs: 
     - deployment: DeployToDevelopment
       pool:
@@ -82,42 +84,49 @@ stages:
       environment: development 
       strategy:
         runOnce:
-          deploy:
+          preDeploy:
             steps:
+              - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+                inputs:
+                  source: 'current'
+                  path: '$(Pipeline.Workspace)'
+
               - task: AzureResourceManagerTemplateDeployment@3
                 inputs:
                   deploymentScope: "Resource Group"
                   azureResourceManagerConnection: $(serviceConnection)
                   subscriptionId: $(subscriptionId)
                   action: "Create Or Update Resource Group"
-                  resourceGroupName: "RG-Datafactory2"
+                  resourceGroupName: "RG-Datafactory"
                   location: "northeurope"
                   templateLocation: "Linked artifact"
                   csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
                   deploymentMode: "Incremental"
                   deploymentOutputs: "ArmOutputs"
-                  overrideParameters:
+                  overrideParameters: |
+                    -dataFactoryName $(dataFactoryName)
                     
+          deploy:
+            steps:
+              # - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+              #   inputs:
+              #     source: 'current'
+              #     path: '$(Pipeline.Workspace)'
 
-  #           - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
-  #             inputs:
-  #               source: 'current'
-  #               path: '$(Pipeline.Workspace)'
-
-  #           - task: AzureResourceManagerTemplateDeployment@3
-  #             displayName: 'ARM Template deployment: Resource Group scope'
-  #             inputs:
-  #               deploymentScope: 'Resource Group'
-  #               azureResourceManagerConnection: 'MVP Sponsorship'
-  #               subscriptionId: '337ba254-3aa0-4551-ba8e-89debefaa373'
-  #               action: 'Create Or Update Resource Group'
-  #               resourceGroupName: 'RG-Datafactory'
-  #               location: 'North Europe'
-  #               templateLocation: 'Linked artifact'
-  #               csmFile: '$(Pipeline.Workspace)/ArmTemplates/ARMTemplateForFactory.json'
-  #               csmParametersFile: '$(Pipeline.Workspace)/ArmTemplates/ARMTemplateParametersForFactory.json'
-  #               overrideParameters: '-factoryName "adf-dev-template"'
-  #               deploymentMode: 'Incremental'
+              - task: AzureResourceManagerTemplateDeployment@3
+                displayName: 'ARM Template deployment: Resource Group scope'
+                inputs:
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: $(serviceConnection)
+                  subscriptionId: $(subscriptionId)
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'RG-Datafactory'
+                  location: 'northeurope'
+                  templateLocation: 'Linked artifact'
+                  csmFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateForFactory.json'
+                  csmParametersFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateParametersForFactory.json'
+                  overrideParameters: '-factoryName $(dataFactoryName)'
+                  deploymentMode: 'Incremental'
 
   # - stage: 'production'
   #   displayName: 'Deploy Changes to Production'
