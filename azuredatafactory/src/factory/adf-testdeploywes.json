@@ -1,0 +1,9 @@
+{
+	"name": "adf-testdeploywes",
+	"location": "northeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "bcd32cbf-9db5-466c-be56-50eb033c7c6e",
+		"tenantId": "47832e2c-ecb7-4a68-b534-b142a21317f0"
+	}
+}

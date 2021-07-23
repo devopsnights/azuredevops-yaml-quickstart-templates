@@ -1,0 +1,110 @@
+trigger:
+  branches:
+    include:
+    - feature/*
+  paths:
+    include:
+    - azuredatafactory/src    
+    
+pool:
+  vmImage: 'ubuntu-latest'
+  
+stages:
+  - stage: build
+    jobs:
+      - job:
+        steps:
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '10.x'
+          displayName: 'Install Node.js'
+
+        - task: Npm@1
+          inputs:
+            command: 'install'
+            verbose: true
+          displayName: 'Install npm package'
+
+        - task: Npm@1
+          inputs:
+            command: 'custom'
+            customCommand: 'run build validate $(Build.Repository.LocalPath) /subscriptions/337ba254-3aa0-4551-ba8e-89debefaa373/resourceGroups/RG-Datafactory/providers/Microsoft.DataFactory/factories/adf-testdeploywes'
+          displayName: 'Validate'
+
+        - task: Npm@1
+          inputs:
+            command: 'custom'
+            customCommand: 'run build export $(Build.Repository.LocalPath) /subscriptions/337ba254-3aa0-4551-ba8e-89debefaa373/resourceGroups/RG-Datafactory/providers/Microsoft.DataFactory/factories/adf-testdeploywes ArmTemplate'
+          displayName: 'Validate and Generate ARM template'
+
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: '$(Build.Repository.LocalPath)/ArmTemplate'
+            artifact: 'ArmTemplates'
+            publishLocation: 'pipeline'
+
+  # - stage: 'development'
+  #   displayName: 'Deploy Changes to Production'
+  #   dependsOn: build
+  #   jobs: 
+  #   - deployment: DeployToProduction
+  #     pool:
+  #       vmImage: 'vs2017-win2016'
+  #     environment: Production 
+  #     strategy:
+  #       runOnce:
+  #         deploy:
+  #           steps:
+
+  #           - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+  #             inputs:
+  #               source: 'current'
+  #               path: '$(Pipeline.Workspace)'
+
+  #           - task: AzureResourceManagerTemplateDeployment@3
+  #             displayName: 'ARM Template deployment: Resource Group scope'
+  #             inputs:
+  #               deploymentScope: 'Resource Group'
+  #               azureResourceManagerConnection: 'MVP Sponsorship'
+  #               subscriptionId: '337ba254-3aa0-4551-ba8e-89debefaa373'
+  #               action: 'Create Or Update Resource Group'
+  #               resourceGroupName: 'RG-Datafactory'
+  #               location: 'North Europe'
+  #               templateLocation: 'Linked artifact'
+  #               csmFile: '$(Pipeline.Workspace)/ArmTemplates/ARMTemplateForFactory.json'
+  #               csmParametersFile: '$(Pipeline.Workspace)/ArmTemplates/ARMTemplateParametersForFactory.json'
+  #               overrideParameters: '-factoryName "adf-dev-template"'
+  #               deploymentMode: 'Incremental'
+
+  # - stage: 'production'
+  #   displayName: 'Deploy Changes to Production'
+  #   dependsOn: build
+  #   jobs: 
+  #   - deployment: DeployToProduction
+  #     pool:
+  #       vmImage: 'vs2017-win2016'
+  #     environment: Production 
+  #     strategy:
+  #       runOnce:
+  #         deploy:
+  #           steps:
+
+  #           - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+  #             inputs:
+  #               source: 'current'
+  #               path: '$(Pipeline.Workspace)'
+
+  #           - task: AzureResourceManagerTemplateDeployment@3
+  #             displayName: 'ARM Template deployment: Resource Group scope'
+  #             inputs:
+  #               deploymentScope: 'Resource Group'
+  #               azureResourceManagerConnection: 'MVP Sponsorship'
+  #               subscriptionId: '337ba254-3aa0-4551-ba8e-89debefaa373'
+  #               action: 'Create Or Update Resource Group'
+  #               resourceGroupName: 'RG-Datafactory'
+  #               location: 'North Europe'
+  #               templateLocation: 'Linked artifact'
+  #               csmFile: '$(Pipeline.Workspace)/ArmTemplates/ARMTemplateForFactory.json'
+  #               csmParametersFile: '$(Pipeline.Workspace)/ArmTemplates/ARMTemplateParametersForFactory.json'
+  #               overrideParameters: '-factoryName "adf-prd-template"'
+  #               deploymentMode: 'Incremental'
