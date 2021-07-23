@@ -90,7 +90,7 @@ stages:
                   azureResourceManagerConnection: $(serviceConnection)
                   subscriptionId: $(subscriptionId)
                   action: "Create Or Update Resource Group"
-                  resourceGroupName: "RG-Datafactory"
+                  resourceGroupName: "RG-Datafactory2"
                   location: "northeurope"
                   templateLocation: "Linked artifact"
                   csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
