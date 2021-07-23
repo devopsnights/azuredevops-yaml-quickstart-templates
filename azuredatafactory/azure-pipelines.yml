@@ -72,18 +72,32 @@ stages:
             artifact: 'datafactory'
             publishLocation: 'pipeline'
 
-  # - stage: 'development'
-  #   displayName: 'Deploy Changes to Production'
-  #   dependsOn: build
-  #   jobs: 
-  #   - deployment: DeployToProduction
-  #     pool:
-  #       vmImage: 'vs2017-win2016'
-  #     environment: Production 
-  #     strategy:
-  #       runOnce:
-  #         deploy:
-  #           steps:
+  - stage: 'development'
+    displayName: 'Deploy Changes to Production'
+    dependsOn: build
+    jobs: 
+    - deployment: DeployToProduction
+      pool:
+        vmImage: 'vs2017-win2016'
+      environment: Production 
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureResourceManagerTemplateDeployment@3
+                inputs:
+                  deploymentScope: "Resource Group"
+                  azureResourceManagerConnection: $(serviceConnection)
+                  subscriptionId: $(subscriptionId)
+                  action: "Create Or Update Resource Group"
+                  resourceGroupName: "RG-Datafactory"
+                  location: "northeurope"
+                  templateLocation: "Linked artifact"
+                  csmFile: '$(Pipeline.Workspace)\infrastructure\datafactory.json'
+                  deploymentMode: "Incremental"
+                  deploymentOutputs: "ArmOutputs"
+                  overrideParameters:
+                    
 
   #           - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
   #             inputs:
