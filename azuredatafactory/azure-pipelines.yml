@@ -9,13 +9,16 @@ trigger:
     
 pool:
   vmImage: 'ubuntu-latest'
-  
+
+variables:
+  workingDir: $(Build.Repository.LocalPath)/azuredatafactory/src
+  serviceConnection: 'AzureServiceConnection' 
+
 stages:
   - stage: build
     jobs:
       - job:
-        variables:
-          workingDir: $(Build.Repository.LocalPath)/azuredatafactory/src
+        
         steps:
         - task: NodeTool@0
           inputs:
@@ -49,8 +52,19 @@ stages:
           inputs:
             SourceFolder: '$(workingDir)/artifacts'
             Contents: '**'
-            TargetFolder: '$(build.artifactstagingdirectory)/artifacts' 
+            TargetFolder: '$(build.artifactstagingdirectory)/application' 
           displayName: 'Copying application artifact'
+
+        - task: AzureCLI@2  
+          displayName: 'Build bicep artifact' 
+          inputs: 
+            azureSubscription: $(serviceConnection)
+            scriptType: 'pscore'  
+            scriptLocation: 'inlineScript'  
+            inlineScript: |
+              $file = "$(Build.SourcesDirectory)/azuredatafactory/iac/datafactory.bicep"            
+              New-Item -ItemType Directory -Force -Path $(build.artifactstagingdirectory)/infrastructure
+              az bicep build --file $file --outdir $(build.artifactstagingdirectory)/infrastructure
 
         - task: PublishPipelineArtifact@1
           inputs:
