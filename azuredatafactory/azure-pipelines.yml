@@ -4,7 +4,7 @@ trigger:
     - feature/*
   paths:
     include:
-    - azuredatafactory/src    
+    - azuredatafactory
     
 pool:
   vmImage: 'ubuntu-latest'
@@ -24,6 +24,8 @@ stages:
             command: 'install'
             verbose: true
           displayName: 'Install npm package'
+
+        - powershell: Get-ChildItem $(Build.Repository.LocalPath) -Recurse
 
         - task: Npm@1
           inputs:
