@@ -73,7 +73,7 @@ stages:
             publishLocation: 'pipeline'
 
   - stage: 'development'
-    displayName: 'Deploy Changes to development'
+    displayName: 'Development deploy'
     dependsOn: build
     variables:
       dataFactoryName: adf-udp-development
@@ -82,6 +82,40 @@ stages:
       pool:
         vmImage: 'vs2017-win2016'
       environment: development 
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+                inputs:
+                  source: 'current'
+                  path: '$(Pipeline.Workspace)'
+
+              - task: AzureResourceManagerTemplateDeployment@3
+                inputs:
+                  deploymentScope: "Resource Group"
+                  azureResourceManagerConnection: $(serviceConnection)
+                  subscriptionId: $(subscriptionId)
+                  action: "Create Or Update Resource Group"
+                  resourceGroupName: "RG-Datafactory"
+                  location: "northeurope"
+                  templateLocation: "Linked artifact"
+                  csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
+                  deploymentMode: "Incremental"
+                  deploymentOutputs: "ArmOutputs"
+                  overrideParameters: |
+                    -dataFactoryName $(dataFactoryName)
+
+  - stage: 'uat'
+    displayName: 'UAT deploy'
+    dependsOn: build
+    variables:
+      dataFactoryName: adf-uat-development
+    jobs: 
+    - deployment: DeployToUAT
+      pool:
+        vmImage: 'vs2017-win2016'
+      environment: uat 
       strategy:
         runOnce:
           preDeploy:
@@ -108,11 +142,6 @@ stages:
                     
           deploy:
             steps:
-              # - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
-              #   inputs:
-              #     source: 'current'
-              #     path: '$(Pipeline.Workspace)'
-
               - task: AzureResourceManagerTemplateDeployment@3
                 displayName: 'ARM Template deployment: Resource Group scope'
                 inputs:
@@ -127,7 +156,6 @@ stages:
                   csmParametersFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateParametersForFactory.json'
                   overrideParameters: '-factoryName $(dataFactoryName)'
                   deploymentMode: 'Incremental'
-
   # - stage: 'production'
   #   displayName: 'Deploy Changes to Production'
   #   dependsOn: build
