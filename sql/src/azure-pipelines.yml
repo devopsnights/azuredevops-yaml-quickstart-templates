@@ -46,4 +46,17 @@ stages:
                     deployType: 'DacpacTask'
                     DeploymentAction: 'Publish'
                     DacpacFile: '$(Pipeline.Workspace)/drop/sql-template.dacpac'
+                    AdditionalArguments: '/p:BlockOnPossibleDataLoss=True /p:ExcludeObjectTypes=Logins;RoleMembership;Users'
                     IpDetectionMethod: 'AutoDetect'
+
+                # - task: SqlAzureDacpacDeployment@1
+                #   inputs:
+                #     azureSubscription: 'AzureServiceConnection'
+                #     AuthenticationType: 'aadAuthenticationIntegrated'
+                #     ServerName: 'sql-udp.database.windows.net'
+                #     DatabaseName: 'sqludp'
+                #     deployType: 'InlineSqlTask'
+                #     SqlInline: |
+                #       dsadas
+                #       das
+                #     IpDetectionMethod: 'AutoDetect'
