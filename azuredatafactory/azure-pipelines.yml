@@ -1,0 +1,213 @@
+trigger:
+  branches:
+    include:
+    - feature/*
+    - release/*
+    - develop
+  paths:
+    include:
+    - azuredatafactory
+    
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  workingDir: $(Build.Repository.LocalPath)/azuredatafactory/src
+  serviceConnection: 'AzureServiceConnection' 
+
+stages:
+  - stage: build
+    jobs:
+      - job:
+        
+        steps:
+        
+        # configuring node
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '10.x'
+          displayName: 'Install Node.js'
+
+        - task: Npm@1
+          inputs:
+            command: 'install'
+            verbose: true
+            workingDir: '$(workingDir)'
+          displayName: 'Install npm package'
+
+        # validating artifacts
+        - task: Npm@1
+          inputs:
+            command: 'custom'
+            customCommand: 'run build validate $(workingDir) /subscriptions/337ba254-3aa0-4551-ba8e-89debefaa373/resourceGroups/RG-Datafactory/providers/Microsoft.DataFactory/factories/adf-testdeploywes'
+            workingDir: '$(workingDir)'
+          displayName: 'Validate'
+
+        # generating ARM Templates from source code
+        - task: Npm@1
+          inputs:
+            command: 'custom'
+            customCommand: 'run build export $(workingDir) /subscriptions/337ba254-3aa0-4551-ba8e-89debefaa373/resourceGroups/RG-Datafactory/providers/Microsoft.DataFactory/factories/adf-testdeploywes artifacts'
+            workingDir: '$(workingDir)'
+          displayName: 'Generate ARM template'
+
+        - task: CopyFiles@2
+          inputs:
+            SourceFolder: '$(workingDir)/artifacts'
+            Contents: '**'
+            TargetFolder: '$(build.artifactstagingdirectory)/application' 
+          displayName: 'Copying application artifact'
+
+        # building bicep into ARM
+        - task: AzureCLI@2  
+          displayName: 'Build bicep artifact' 
+          inputs: 
+            azureSubscription: $(serviceConnection)
+            scriptType: 'pscore'  
+            scriptLocation: 'inlineScript'  
+            inlineScript: |
+              $file = "$(Build.SourcesDirectory)/azuredatafactory/iac/datafactory.bicep"            
+              New-Item -ItemType Directory -Force -Path $(build.artifactstagingdirectory)/infrastructure
+              az bicep build --file $file --outdir $(build.artifactstagingdirectory)/infrastructure
+
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: '$(build.artifactstagingdirectory)'
+            artifact: 'datafactory'
+            publishLocation: 'pipeline'
+
+  - stage: 'development'
+    displayName: 'Development deploy'
+    dependsOn: build
+    variables:
+      dataFactoryName: adf-quickstart-dev
+    jobs: 
+    - deployment: DeployToDevelopment
+      pool:
+        vmImage: 'vs2017-win2016'
+      environment: development 
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+                inputs:
+                  source: 'current'
+                  path: '$(Pipeline.Workspace)'
+
+              - task: AzureResourceManagerTemplateDeployment@3
+                displayName: Creating ADF Infrastructure by IaC
+                inputs:
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: '$(serviceConnection)'
+                  subscriptionId: '$(subscriptionId)'
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'RG-Datafactory'
+                  location: 'northeurope'
+                  templateLocation: 'Linked artifact'
+                  csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
+                  overrideParameters: -dataFactoryName $(dataFactoryName) -environment development
+                  deploymentMode: 'Incremental'
+                  deploymentOutputs: 'ArmOutputs'
+          
+  - stage: 'uat'
+    displayName: 'UAT deploy'
+    dependsOn: development
+    variables:
+      dataFactoryName: adf-quickstart-uat
+    jobs: 
+    - deployment: DeployToUAT
+      pool:
+        vmImage: 'vs2017-win2016'
+      environment: uat 
+      strategy:
+        runOnce:
+          preDeploy:
+            steps:
+              - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+                inputs:
+                  source: 'current'
+                  path: '$(Pipeline.Workspace)'
+
+              - task: AzureResourceManagerTemplateDeployment@3
+                displayName: Creating ADF Infrastructure by IaC
+                inputs:
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: '$(serviceConnection)'
+                  subscriptionId: '$(subscriptionId)'
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'RG-Datafactory'
+                  location: 'northeurope'
+                  templateLocation: 'Linked artifact'
+                  csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
+                  overrideParameters: '-dataFactoryName $(dataFactoryName)'
+                  deploymentMode: 'Incremental'
+                  deploymentOutputs: 'ArmOutputs'
+
+          deploy:
+            steps:
+              - task: AzureResourceManagerTemplateDeployment@3
+                displayName: 'Deploying ADF Artificats'
+                inputs:
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: $(serviceConnection)
+                  subscriptionId: $(subscriptionId)
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'RG-Datafactory'
+                  location: 'northeurope'
+                  templateLocation: 'Linked artifact'
+                  csmFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateForFactory.json'
+                  csmParametersFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateParametersForFactory.json'
+                  overrideParameters: '-factoryName $(dataFactoryName)'
+                  deploymentMode: 'Incremental'
+
+  - stage: prd
+    displayName: Production deploy
+    dependsOn: uat
+    variables:
+      dataFactoryName: adf-quickstart-prd
+    jobs: 
+    - deployment: DeployToPRD
+      pool:
+        vmImage: vs2017-win2016
+      environment: production
+      strategy:
+        runOnce:
+          preDeploy:
+            steps:
+              - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+                inputs:
+                  source: 'current'
+                  path: '$(Pipeline.Workspace)'
+
+              - task: AzureResourceManagerTemplateDeployment@3
+                displayName: Creating ADF Infrastructure by IaC
+                inputs:
+                  deploymentScope: "Resource Group"
+                  azureResourceManagerConnection: $(serviceConnection)
+                  subscriptionId: $(subscriptionId)
+                  action: "Create Or Update Resource Group"
+                  resourceGroupName: "RG-Datafactory"
+                  location: "northeurope"
+                  templateLocation: "Linked artifact"
+                  csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
+                  deploymentMode: "Incremental"
+                  deploymentOutputs: "ArmOutputs"
+                  overrideParameters: -dataFactoryName $(dataFactoryName)
+
+          deploy:
+            steps:
+              - task: AzureResourceManagerTemplateDeployment@3
+                displayName: 'Deploying ADF Artificats'
+                inputs:
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: $(serviceConnection)
+                  subscriptionId: $(subscriptionId)
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'RG-Datafactory'
+                  location: 'northeurope'
+                  templateLocation: 'Linked artifact'
+                  csmFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateForFactory.json'
+                  csmParametersFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateParametersForFactory.json'
+                  overrideParameters: '-factoryName $(dataFactoryName)'
+                  deploymentMode: 'Incremental'

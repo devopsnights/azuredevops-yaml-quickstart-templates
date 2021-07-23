@@ -1,6 +1,11 @@
 trigger:
-- master
-- feature/*
+  branches:
+    include:
+    - feature/*
+    - master
+  paths:
+    include:
+    - sql
 
 pool:
   vmImage: windows-latest
