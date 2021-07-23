@@ -13,9 +13,9 @@ pool:
 stages:
   - stage: build
     jobs:
-    variables:
-      workingDir: $(Build.Repository.LocalPath)/azuredatafactory/src
       - job:
+        variables:
+          workingDir: $(Build.Repository.LocalPath)/azuredatafactory/src
         steps:
         - task: NodeTool@0
           inputs:
