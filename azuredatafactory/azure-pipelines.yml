@@ -104,7 +104,7 @@ stages:
                   deploymentMode: "Incremental"
                   deploymentOutputs: "ArmOutputs"
                   overrideParameters:
-                    -dataFactoryName '$(dataFactoryName)'
+                    -dataFactoryName $(dataFactoryName)
                     # -repositoryType 'FactoryGitHubConfiguration'
                     # -repositoryName 'devopsnights/azuredevops-yaml-quickstart-templates'
                     # -accountName 'devopsnights'
