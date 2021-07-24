@@ -76,7 +76,7 @@ stages:
     displayName: 'Development deploy'
     dependsOn: build
     variables:
-      dataFactoryName: adf-udp-development
+      dataFactoryName: adf-quickstart-dev
     jobs: 
     - deployment: DeployToDevelopment
       pool:
@@ -110,7 +110,7 @@ stages:
     displayName: 'UAT deploy'
     dependsOn: development
     variables:
-      dataFactoryName: adf-uat-development
+      dataFactoryName: adf-quickstart-uat
     jobs: 
     - deployment: DeployToUAT
       pool:
