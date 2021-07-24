@@ -103,11 +103,11 @@ stages:
                   csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
                   deploymentMode: "Incremental"
                   deploymentOutputs: "ArmOutputs"
-                  overrideParameters: |
+                  overrideParameters:
                     -dataFactoryName '$(dataFactoryName)'
-                    -repositoryType 'FactoryGitHubConfiguration'
-                    -repositoryName 'devopsnights/azuredevops-yaml-quickstart-templates'
-                    -accountName 'devopsnights'
+                    # -repositoryType 'FactoryGitHubConfiguration'
+                    # -repositoryName 'devopsnights/azuredevops-yaml-quickstart-templates'
+                    # -accountName 'devopsnights'
 
 
   # - stage: 'uat'

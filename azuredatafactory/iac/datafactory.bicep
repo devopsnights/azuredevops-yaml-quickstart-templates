@@ -1,5 +1,5 @@
 
-param dataFactoryName string = 'adf-template-bicep'
+param dataFactoryName string = 'adf-template-bicep-gh'
 param location string = resourceGroup().location
 param environment string = 'development'
 
@@ -9,12 +9,12 @@ param environment string = 'development'
 //   'FactoryVSTSConfiguration'
 //   'FactoryGitHubConfiguration'
 // ])
-param repositoryType string = 'FactoryVSTSConfiguration'
+param repositoryType string = 'FactoryGitHubConfiguration'
 param projectName string  = 'Sandbox'
-param repositoryName string = 'adf-template'
-param accountName string = 'wesleycamargo'
+param repositoryName string = 'azuredevops-yaml-quickstart-templates'
+param accountName string = 'devopsnights'
 param collaborationBranch string = 'develop'
-param rootFolder string = '/datafactory/src'
+param rootFolder string = '/azuredatafactory/src'
 param hostName string = ''
 
 
