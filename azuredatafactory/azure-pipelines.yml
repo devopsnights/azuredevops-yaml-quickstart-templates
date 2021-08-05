@@ -106,7 +106,7 @@ stages:
                   csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
                   deploymentMode: "Incremental"
                   deploymentOutputs: "ArmOutputs"
-                  overrideParameters: -dataFactoryName $(dataFactoryName) -environment 'development'
+                  overrideParameters: -dataFactoryName $(dataFactoryName)
 
   # - stage: 'uat'
   #   displayName: 'UAT deploy'
