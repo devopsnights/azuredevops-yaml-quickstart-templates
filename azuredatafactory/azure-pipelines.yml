@@ -96,17 +96,19 @@ stages:
 
               - task: AzureResourceManagerTemplateDeployment@3
                 inputs:
-                  deploymentScope: "Resource Group"
-                  azureResourceManagerConnection: $(serviceConnection)
-                  subscriptionId: $(subscriptionId)
-                  action: "Create Or Update Resource Group"
-                  resourceGroupName: "RG-Datafactory"
-                  location: "northeurope"
-                  templateLocation: "Linked artifact"
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: '$(serviceConnection)'
+                  subscriptionId: '$(subscriptionId)'
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'RG-Datafactory'
+                  location: 'northeurope'
+                  templateLocation: 'Linked artifact'
                   csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
-                  deploymentMode: "Incremental"
-                  deploymentOutputs: "ArmOutputs"
-                  overrideParameters: -dataFactoryName $(dataFactoryName)
+                  overrideParameters: |
+                    -dataFactoryName $(dataFactoryName)
+                    -environment development
+                  deploymentMode: 'Incremental'
+                  deploymentOutputs: 'ArmOutputs'
 
   # - stage: 'uat'
   #   displayName: 'UAT deploy'
