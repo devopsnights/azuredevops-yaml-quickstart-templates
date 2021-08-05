@@ -169,7 +169,7 @@ stages:
     - deployment: DeployToPRD
       pool:
         vmImage: 'vs2017-win2016'
-      environment: prd 
+      environment: production 
       strategy:
         runOnce:
           preDeploy:
