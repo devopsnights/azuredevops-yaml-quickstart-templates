@@ -106,7 +106,7 @@ stages:
                   csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
                   deploymentMode: "Incremental"
                   deploymentOutputs: "ArmOutputs"
-                  overrideParameters: |
+                  overrideParameters:
                     -dataFactoryName '$(dataFactoryName)'
                     -environment 'development'
 
