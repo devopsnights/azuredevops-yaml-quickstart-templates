@@ -107,7 +107,7 @@ stages:
                   deploymentMode: "Incremental"
                   deploymentOutputs: "ArmOutputs"
                   overrideParameters:
-                    -dataFactoryName '$(dataFactoryName)'
+                    -dataFactoryName $(dataFactoryName)
                     -environment 'development'
 
   # - stage: 'uat'
