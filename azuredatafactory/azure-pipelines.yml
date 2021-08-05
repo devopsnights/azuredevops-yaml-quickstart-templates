@@ -143,6 +143,7 @@ stages:
                   deploymentOutputs: "ArmOutputs"
                   overrideParameters: |
                     -dataFactoryName $(dataFactoryName)
+                    -environment 'uat'
 
           deploy:
             steps:
@@ -194,6 +195,7 @@ stages:
                   deploymentOutputs: "ArmOutputs"
                   overrideParameters: |
                     -dataFactoryName $(dataFactoryName)
+                    -environment 'production'
                     
           deploy:
             steps:
