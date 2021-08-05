@@ -160,7 +160,7 @@ stages:
                   overrideParameters: '-factoryName $(dataFactoryName)'
                   deploymentMode: 'Incremental'
 
-  - stage: 'prd'
+  - stage: 'production'
     displayName: 'Production deploy'
     dependsOn: uat
     variables:
