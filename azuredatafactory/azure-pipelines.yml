@@ -104,9 +104,7 @@ stages:
                   location: 'northeurope'
                   templateLocation: 'Linked artifact'
                   csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
-                  overrideParameters: |
-                    -dataFactoryName $(dataFactoryName)
-                    -environment development
+                  overrideParameters: -dataFactoryName $(dataFactoryName) -environment development
                   deploymentMode: 'Incremental'
                   deploymentOutputs: 'ArmOutputs'
 
