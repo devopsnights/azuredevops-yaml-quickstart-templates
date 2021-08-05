@@ -108,6 +108,7 @@ stages:
                   deploymentOutputs: "ArmOutputs"
                   overrideParameters: |
                     -dataFactoryName $(dataFactoryName)
+                    -environment 'development'
 
   - stage: 'uat'
     displayName: 'UAT deploy'
@@ -142,7 +143,7 @@ stages:
                   deploymentOutputs: "ArmOutputs"
                   overrideParameters: |
                     -dataFactoryName $(dataFactoryName)
-                    
+
           deploy:
             steps:
               - task: AzureResourceManagerTemplateDeployment@3

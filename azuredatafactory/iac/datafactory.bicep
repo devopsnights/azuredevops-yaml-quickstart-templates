@@ -1,7 +1,7 @@
 
 param dataFactoryName string = 'adf-template-bicep-gh'
 param location string = resourceGroup().location
-param environment string = 'development'
+param environment string = ''
 
 
 
@@ -16,20 +16,6 @@ param accountName string = 'devopsnights'
 param collaborationBranch string = 'develop'
 param rootFolder string = '/azuredatafactory/src'
 param hostName string = ''
-
-
-
-  
-
-
-// var repoConfiguration = {
-//   accountName: accountName
-//   repositoryName: repositoryName
-//   collaborationBranch: collaborationBranch
-//   rootFolder: rootFolder  
-//   type: repositoryType
-//   (repositoryType == 'FactoryVSTSConfiguration'): _projectName: _hostName
-// }
 
 var azDevopsRepoConfiguration = {
   accountName: accountName
