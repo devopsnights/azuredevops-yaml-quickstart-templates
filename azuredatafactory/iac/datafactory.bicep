@@ -34,13 +34,16 @@ var gitHubRepoConfiguration = {
   type: repositoryType
 }
 
+var repoConfiguration = (repositoryType == 'FactoryVSTSConfiguration') ? azDevopsRepoConfiguration : gitHubRepoConfiguration 
 
 resource dataFactoryName_resource 'Microsoft.DataFactory/factories@2018-06-01' =  {
   name: dataFactoryName
   location: location
-  properties: {
-    repoConfiguration: (environment == 'development') ? (repositoryType == 'FactoryVSTSConfiguration') ? azDevopsRepoConfiguration : gitHubRepoConfiguration : {}
-  }
+  // properties: {
+  //   repoConfiguration: (environment == 'development') ? (repositoryType == 'FactoryVSTSConfiguration') ? azDevopsRepoConfiguration : gitHubRepoConfiguration : {}
+  // }
+  properties: (environment == 'development') ? repoConfiguration : {}
+  
   identity: {
     type: 'SystemAssigned'
   }  
