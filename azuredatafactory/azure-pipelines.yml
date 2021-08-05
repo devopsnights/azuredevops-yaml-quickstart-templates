@@ -20,6 +20,8 @@ stages:
       - job:
         
         steps:
+        
+        # configuring node
         - task: NodeTool@0
           inputs:
             versionSpec: '10.x'
@@ -32,8 +34,7 @@ stages:
             workingDir: '$(workingDir)'
           displayName: 'Install npm package'
 
-        - powershell: Get-ChildItem $(workingDir) -Recurse
-
+        # validating artifacts
         - task: Npm@1
           inputs:
             command: 'custom'
@@ -41,12 +42,13 @@ stages:
             workingDir: '$(workingDir)'
           displayName: 'Validate'
 
+        # generating ARM Templates from source code
         - task: Npm@1
           inputs:
             command: 'custom'
             customCommand: 'run build export $(workingDir) /subscriptions/337ba254-3aa0-4551-ba8e-89debefaa373/resourceGroups/RG-Datafactory/providers/Microsoft.DataFactory/factories/adf-testdeploywes artifacts'
             workingDir: '$(workingDir)'
-          displayName: 'Validate and Generate ARM template'
+          displayName: 'Generate ARM template'
 
         - task: CopyFiles@2
           inputs:
@@ -55,6 +57,7 @@ stages:
             TargetFolder: '$(build.artifactstagingdirectory)/application' 
           displayName: 'Copying application artifact'
 
+        # building bicep into ARM
         - task: AzureCLI@2  
           displayName: 'Build bicep artifact' 
           inputs: 
@@ -76,7 +79,7 @@ stages:
     displayName: 'Development deploy'
     dependsOn: build
     variables:
-      dataFactoryName: adf-quickstart-dev-gh
+      dataFactoryName: adf-quickstart-dev
     jobs: 
     - deployment: DeployToDevelopment
       pool:
@@ -103,60 +106,107 @@ stages:
                   csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
                   deploymentMode: "Incremental"
                   deploymentOutputs: "ArmOutputs"
-                  overrideParameters:
+                  overrideParameters: |
                     -dataFactoryName $(dataFactoryName)
-                    # -repositoryType 'FactoryGitHubConfiguration'
-                    # -repositoryName 'devopsnights/azuredevops-yaml-quickstart-templates'
-                    # -accountName 'devopsnights'
 
+  - stage: 'uat'
+    displayName: 'UAT deploy'
+    dependsOn: development
+    variables:
+      dataFactoryName: adf-quickstart-uat
+    jobs: 
+    - deployment: DeployToUAT
+      pool:
+        vmImage: 'vs2017-win2016'
+      environment: uat 
+      strategy:
+        runOnce:
+          preDeploy:
+            steps:
+              - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+                inputs:
+                  source: 'current'
+                  path: '$(Pipeline.Workspace)'
 
-  # - stage: 'uat'
-  #   displayName: 'UAT deploy'
-  #   dependsOn: development
-  #   variables:
-  #     dataFactoryName: adf-quickstart-uat
-  #   jobs: 
-  #   - deployment: DeployToUAT
-  #     pool:
-  #       vmImage: 'vs2017-win2016'
-  #     environment: uat 
-  #     strategy:
-  #       runOnce:
-  #         preDeploy:
-  #           steps:
-  #             - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
-  #               inputs:
-  #                 source: 'current'
-  #                 path: '$(Pipeline.Workspace)'
-
-  #             - task: AzureResourceManagerTemplateDeployment@3
-  #               inputs:
-  #                 deploymentScope: "Resource Group"
-  #                 azureResourceManagerConnection: $(serviceConnection)
-  #                 subscriptionId: $(subscriptionId)
-  #                 action: "Create Or Update Resource Group"
-  #                 resourceGroupName: "RG-Datafactory"
-  #                 location: "northeurope"
-  #                 templateLocation: "Linked artifact"
-  #                 csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
-  #                 deploymentMode: "Incremental"
-  #                 deploymentOutputs: "ArmOutputs"
-  #                 overrideParameters: |
-  #                   -dataFactoryName $(dataFactoryName)
+              - task: AzureResourceManagerTemplateDeployment@3
+                inputs:
+                  deploymentScope: "Resource Group"
+                  azureResourceManagerConnection: $(serviceConnection)
+                  subscriptionId: $(subscriptionId)
+                  action: "Create Or Update Resource Group"
+                  resourceGroupName: "RG-Datafactory"
+                  location: "northeurope"
+                  templateLocation: "Linked artifact"
+                  csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
+                  deploymentMode: "Incremental"
+                  deploymentOutputs: "ArmOutputs"
+                  overrideParameters: |
+                    -dataFactoryName $(dataFactoryName)
                     
-  #         deploy:
-  #           steps:
-  #             - task: AzureResourceManagerTemplateDeployment@3
-  #               displayName: 'ARM Template deployment: Resource Group scope'
-  #               inputs:
-  #                 deploymentScope: 'Resource Group'
-  #                 azureResourceManagerConnection: $(serviceConnection)
-  #                 subscriptionId: $(subscriptionId)
-  #                 action: 'Create Or Update Resource Group'
-  #                 resourceGroupName: 'RG-Datafactory'
-  #                 location: 'northeurope'
-  #                 templateLocation: 'Linked artifact'
-  #                 csmFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateForFactory.json'
-  #                 csmParametersFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateParametersForFactory.json'
-  #                 overrideParameters: '-factoryName $(dataFactoryName)'
-  #                 deploymentMode: 'Incremental'
+          deploy:
+            steps:
+              - task: AzureResourceManagerTemplateDeployment@3
+                displayName: 'ARM Template deployment: Resource Group scope'
+                inputs:
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: $(serviceConnection)
+                  subscriptionId: $(subscriptionId)
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'RG-Datafactory'
+                  location: 'northeurope'
+                  templateLocation: 'Linked artifact'
+                  csmFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateForFactory.json'
+                  csmParametersFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateParametersForFactory.json'
+                  overrideParameters: '-factoryName $(dataFactoryName)'
+                  deploymentMode: 'Incremental'
+
+  - stage: 'prd'
+    displayName: 'Production deploy'
+    dependsOn: uat
+    variables:
+      dataFactoryName: adf-quickstart-prd
+    jobs: 
+    - deployment: DeployToPRD
+      pool:
+        vmImage: 'vs2017-win2016'
+      environment: prd 
+      strategy:
+        runOnce:
+          preDeploy:
+            steps:
+              - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+                inputs:
+                  source: 'current'
+                  path: '$(Pipeline.Workspace)'
+
+              - task: AzureResourceManagerTemplateDeployment@3
+                inputs:
+                  deploymentScope: "Resource Group"
+                  azureResourceManagerConnection: $(serviceConnection)
+                  subscriptionId: $(subscriptionId)
+                  action: "Create Or Update Resource Group"
+                  resourceGroupName: "RG-Datafactory"
+                  location: "northeurope"
+                  templateLocation: "Linked artifact"
+                  csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
+                  deploymentMode: "Incremental"
+                  deploymentOutputs: "ArmOutputs"
+                  overrideParameters: |
+                    -dataFactoryName $(dataFactoryName)
+                    
+          deploy:
+            steps:
+              - task: AzureResourceManagerTemplateDeployment@3
+                displayName: 'ARM Template deployment: Resource Group scope'
+                inputs:
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: $(serviceConnection)
+                  subscriptionId: $(subscriptionId)
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'RG-Datafactory'
+                  location: 'northeurope'
+                  templateLocation: 'Linked artifact'
+                  csmFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateForFactory.json'
+                  csmParametersFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateParametersForFactory.json'
+                  overrideParameters: '-factoryName $(dataFactoryName)'
+                  deploymentMode: 'Incremental'
