@@ -42,7 +42,7 @@ resource dataFactoryName_resource 'Microsoft.DataFactory/factories@2018-06-01' =
   // properties: {
   //   repoConfiguration: (environment == 'development') ? (repositoryType == 'FactoryVSTSConfiguration') ? azDevopsRepoConfiguration : gitHubRepoConfiguration : {}
   // }
-  properties: (environment == 'development') ? repoConfiguration : {}
+  properties: repoConfiguration
   
   identity: {
     type: 'SystemAssigned'
