@@ -1,0 +1,39 @@
+{
+	"name": "new-pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Wait1",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 10
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Wait1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "variable",
+					"value": "Hello World!"
+				}
+			}
+		],
+		"variables": {
+			"variable": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
