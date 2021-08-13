@@ -159,7 +159,7 @@ stages:
                   csmFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateForFactory.json'
                   csmParametersFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateParametersForFactory.json'
                   overrideParameters: '-factoryName $(dataFactoryName)'
-                  deploymentMode: 'Complete'
+                  deploymentMode: 'Incremental'
 
   - stage: prd
     displayName: Production deploy
@@ -210,4 +210,4 @@ stages:
                   csmFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateForFactory.json'
                   csmParametersFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateParametersForFactory.json'
                   overrideParameters: '-factoryName $(dataFactoryName)'
-                  deploymentMode: 'Complete'
+                  deploymentMode: 'Incremental'
