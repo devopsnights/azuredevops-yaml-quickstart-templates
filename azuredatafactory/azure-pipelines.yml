@@ -94,7 +94,8 @@ stages:
                   source: 'current'
                   path: '$(Pipeline.Workspace)'
 
-              - task: AzureResourceManagerTemplateDeployment@3
+              - task: AzureResourceManagerTemplateDeployment@3\
+                displayName: Creating ADF by IaC
                 inputs:
                   deploymentScope: 'Resource Group'
                   azureResourceManagerConnection: '$(serviceConnection)'
@@ -128,6 +129,7 @@ stages:
                   path: '$(Pipeline.Workspace)'
 
               - task: AzureResourceManagerTemplateDeployment@3
+                displayName: Creating ADF by IaC
                 inputs:
                   deploymentScope: "Resource Group"
                   azureResourceManagerConnection: $(serviceConnection)
@@ -144,7 +146,7 @@ stages:
           deploy:
             steps:
               - task: AzureResourceManagerTemplateDeployment@3
-                displayName: 'ARM Template deployment: Resource Group scope'
+                displayName: 'Deploying ADF Artifacts'
                 inputs:
                   deploymentScope: 'Resource Group'
                   azureResourceManagerConnection: $(serviceConnection)
@@ -178,6 +180,7 @@ stages:
                   path: '$(Pipeline.Workspace)'
 
               - task: AzureResourceManagerTemplateDeployment@3
+                displayName: Creating ADF by IaC
                 inputs:
                   deploymentScope: "Resource Group"
                   azureResourceManagerConnection: $(serviceConnection)
@@ -194,7 +197,7 @@ stages:
           deploy:
             steps:
               - task: AzureResourceManagerTemplateDeployment@3
-                displayName: 'ARM Template deployment: Resource Group scope'
+                displayName: 'Deploying ADF Artifacts'
                 inputs:
                   deploymentScope: 'Resource Group'
                   azureResourceManagerConnection: $(serviceConnection)
