@@ -1,9 +1,7 @@
 
 param dataFactoryName string = 'adf-template-bicep-gh'
 param location string = resourceGroup().location
-param environment string = 'development'
-
-
+param environment string = ''
 
 // @allowed([
 //   'FactoryVSTSConfiguration'
