@@ -88,7 +88,7 @@ stages:
       environment: development 
       strategy:
         runOnce:
-          deploy:
+          preDeploy:
             steps:
               - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
                 inputs:
@@ -109,6 +109,22 @@ stages:
                   overrideParameters: -dataFactoryName $(dataFactoryName) -environment development
                   deploymentMode: 'Incremental'
                   deploymentOutputs: 'ArmOutputs'
+          deploy:
+            steps:
+              - task: AzureResourceManagerTemplateDeployment@3
+                displayName: 'Deploying ADF Artificats'
+                inputs:
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: $(serviceConnection)
+                  subscriptionId: $(subscriptionId)
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'RG-Datafactory'
+                  location: 'northeurope'
+                  templateLocation: 'Linked artifact'
+                  csmFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateForFactory.json'
+                  csmParametersFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateParametersForFactory.json'
+                  overrideParameters: '-factoryName $(dataFactoryName)'
+                  deploymentMode: 'Incremental'
 
   - stage: 'uat'
     displayName: 'UAT deploy'
@@ -141,7 +157,7 @@ stages:
                   templateLocation: 'Linked artifact'
                   csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
                   overrideParameters: '-dataFactoryName $(dataFactoryName)'
-                  deploymentMode: 'Complete'
+                  deploymentMode: 'Incremental'
                   deploymentOutputs: 'ArmOutputs'
 
           deploy:
@@ -159,7 +175,7 @@ stages:
                   csmFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateForFactory.json'
                   csmParametersFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateParametersForFactory.json'
                   overrideParameters: '-factoryName $(dataFactoryName)'
-                  deploymentMode: 'Incremental'
+                  deploymentMode: 'Complete'
 
   - stage: prd
     displayName: Production deploy
