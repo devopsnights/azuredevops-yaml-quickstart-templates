@@ -94,8 +94,8 @@ stages:
                   source: 'current'
                   path: '$(Pipeline.Workspace)'
 
-              - task: AzureResourceManagerTemplateDeployment@3\
-                displayName: Creating ADF by IaC
+              - task: AzureResourceManagerTemplateDeployment@3
+                displayName: Creating ADF Infrastructure by IaC
                 inputs:
                   deploymentScope: 'Resource Group'
                   azureResourceManagerConnection: '$(serviceConnection)'
@@ -129,7 +129,7 @@ stages:
                   path: '$(Pipeline.Workspace)'
 
               - task: AzureResourceManagerTemplateDeployment@3
-                displayName: Creating ADF by IaC
+                displayName: Creating ADF Infrastructure by IaC
                 inputs:
                   deploymentScope: "Resource Group"
                   azureResourceManagerConnection: $(serviceConnection)
@@ -146,7 +146,7 @@ stages:
           deploy:
             steps:
               - task: AzureResourceManagerTemplateDeployment@3
-                displayName: 'Deploying ADF Artifacts'
+                displayName: 'Deploying ADF Artificats'
                 inputs:
                   deploymentScope: 'Resource Group'
                   azureResourceManagerConnection: $(serviceConnection)
@@ -180,7 +180,7 @@ stages:
                   path: '$(Pipeline.Workspace)'
 
               - task: AzureResourceManagerTemplateDeployment@3
-                displayName: Creating ADF by IaC
+                displayName: Creating ADF Infrastructure by IaC
                 inputs:
                   deploymentScope: "Resource Group"
                   azureResourceManagerConnection: $(serviceConnection)
@@ -197,7 +197,7 @@ stages:
           deploy:
             steps:
               - task: AzureResourceManagerTemplateDeployment@3
-                displayName: 'Deploying ADF Artifacts'
+                displayName: 'Deploying ADF Artificats'
                 inputs:
                   deploymentScope: 'Resource Group'
                   azureResourceManagerConnection: $(serviceConnection)
