@@ -132,17 +132,17 @@ stages:
               - task: AzureResourceManagerTemplateDeployment@3
                 displayName: Creating ADF Infrastructure by IaC
                 inputs:
-                  deploymentScope: "Resource Group"
-                  azureResourceManagerConnection: $(serviceConnection)
-                  subscriptionId: $(subscriptionId)
-                  action: "Create Or Update Resource Group"
-                  resourceGroupName: "RG-Datafactory"
-                  location: "northeurope"
-                  templateLocation: "Linked artifact"
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: '$(serviceConnection)'
+                  subscriptionId: '$(subscriptionId)'
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'RG-Datafactory'
+                  location: 'northeurope'
+                  templateLocation: 'Linked artifact'
                   csmFile: '$(Pipeline.Workspace)\datafactory\infrastructure\datafactory.json'
-                  deploymentMode: "Incremental"
-                  deploymentOutputs: "ArmOutputs"
-                  overrideParameters: -dataFactoryName $(dataFactoryName)
+                  overrideParameters: '-dataFactoryName $(dataFactoryName)'
+                  deploymentMode: 'Complete'
+                  deploymentOutputs: 'ArmOutputs'
 
           deploy:
             steps:
@@ -210,4 +210,4 @@ stages:
                   csmFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateForFactory.json'
                   csmParametersFile: '$(Pipeline.Workspace)/datafactory/application/ARMTemplateParametersForFactory.json'
                   overrideParameters: '-factoryName $(dataFactoryName)'
-                  deploymentMode: 'Incremental'
+                  deploymentMode: 'Complete'
