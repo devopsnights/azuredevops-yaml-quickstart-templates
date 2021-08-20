@@ -57,7 +57,7 @@ stages:
                   path: '$(Pipeline.Workspace)'
 
               - powershell: Get-ChildItem $(Pipeline.Workspace) -Recurse
-              
+
               - task: AzureResourceManagerTemplateDeployment@3
                 displayName: Creating Databricks Infrastructure by IaC
                 inputs:
@@ -68,7 +68,7 @@ stages:
                   resourceGroupName: 'RG-Databricks'
                   location: 'northeurope'
                   templateLocation: 'Linked artifact'
-                  csmFile: '$(Pipeline.Workspace)\databricks\infrastructure\databricks.json'
+                  csmFile: '$(Pipeline.Workspace)/databricks/infrastructure/databricks.json'
                   overrideParameters: -databricksWorkspaceName $(databricksWorkspaceName)
                   deploymentMode: 'Incremental'
                   deploymentOutputs: 'ArmOutputs'
@@ -100,7 +100,7 @@ stages:
                   resourceGroupName: 'RG-Databricks'
                   location: 'northeurope'
                   templateLocation: 'Linked artifact'
-                  csmFile: '$(Pipeline.Workspace)\databricks\infrastructure\databricks.json'
+                  csmFile: '$(Pipeline.Workspace)/databricks/infrastructure/databricks.json'
                   overrideParameters: -databricksWorkspaceName $(databricksWorkspaceName)
                   deploymentMode: 'Incremental'
                   deploymentOutputs: 'ArmOutputs'          
