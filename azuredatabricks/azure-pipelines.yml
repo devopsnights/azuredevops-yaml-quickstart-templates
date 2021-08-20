@@ -56,8 +56,10 @@ stages:
                   source: 'current'
                   path: '$(Pipeline.Workspace)'
 
+              - powershell: Get-ChildItem $(Pipeline.Workspace) -Recurse
+              
               - task: AzureResourceManagerTemplateDeployment@3
-                displayName: Creating ADF Infrastructure by IaC
+                displayName: Creating Databricks Infrastructure by IaC
                 inputs:
                   deploymentScope: 'Resource Group'
                   azureResourceManagerConnection: '$(serviceConnection)'
