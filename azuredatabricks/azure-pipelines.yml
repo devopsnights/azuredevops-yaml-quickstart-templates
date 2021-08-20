@@ -1,0 +1,105 @@
+trigger:
+  branches:
+    include:
+    - feature/*
+    - release/*
+    - develop
+  paths:
+    include:
+    - azuredatabricks
+    
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  workingDir: $(Build.Repository.LocalPath)/azuredatabricks/src
+  serviceConnection: 'AzureServiceConnection' 
+
+stages:
+  - stage: build
+    jobs:
+      - job:
+        
+        steps:
+        # building bicep into ARM
+        - task: AzureCLI@2  
+          displayName: 'Build bicep artifact' 
+          inputs: 
+            azureSubscription: $(serviceConnection)
+            scriptType: 'pscore'  
+            scriptLocation: 'inlineScript'  
+            inlineScript: |
+              $file = "$(Build.SourcesDirectory)/azuredatabricks/iac/databricks.bicep"            
+              New-Item -ItemType Directory -Force -Path $(build.artifactstagingdirectory)/infrastructure
+              az bicep build --file $file --outdir $(build.artifactstagingdirectory)/infrastructure
+
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: '$(build.artifactstagingdirectory)'
+            artifact: 'databricks'
+            publishLocation: 'pipeline'
+
+  - stage: 'development'
+    displayName: 'Development deploy'
+    dependsOn: build
+    variables:
+      databricksWorkspaceName: databricks-quickstart-dev
+    jobs: 
+    - deployment: DeployToDevelopment
+      environment: development 
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+                inputs:
+                  source: 'current'
+                  path: '$(Pipeline.Workspace)'
+
+              - task: AzureResourceManagerTemplateDeployment@3
+                displayName: Creating ADF Infrastructure by IaC
+                inputs:
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: '$(serviceConnection)'
+                  subscriptionId: '$(subscriptionId)'
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'RG-Databricks'
+                  location: 'northeurope'
+                  templateLocation: 'Linked artifact'
+                  csmFile: '$(Pipeline.Workspace)\databricks\infrastructure\databricks.json'
+                  overrideParameters: -databricksWorkspaceName $(databricksWorkspaceName)
+                  deploymentMode: 'Incremental'
+                  deploymentOutputs: 'ArmOutputs'
+  
+  - stage: 'uat'
+    displayName: 'UAT deploy'
+    dependsOn: build
+    variables:
+      databricksWorkspaceName: databricks-quickstart-uat
+    jobs: 
+    - deployment: DeployToUAT
+      environment: uat 
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+                inputs:
+                  source: 'current'
+                  path: '$(Pipeline.Workspace)'
+
+              - task: AzureResourceManagerTemplateDeployment@3
+                displayName: Creating ADF Infrastructure by IaC
+                inputs:
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: '$(serviceConnection)'
+                  subscriptionId: '$(subscriptionId)'
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: 'RG-Databricks'
+                  location: 'northeurope'
+                  templateLocation: 'Linked artifact'
+                  csmFile: '$(Pipeline.Workspace)\databricks\infrastructure\databricks.json'
+                  overrideParameters: -databricksWorkspaceName $(databricksWorkspaceName)
+                  deploymentMode: 'Incremental'
+                  deploymentOutputs: 'ArmOutputs'          
+  
