@@ -14,3 +14,47 @@ steps:
   displayName: 'Run a one-line script'
 
 
+- task: replacetokens@4
+  inputs:
+    targetFiles: '**/*.config'
+    encoding: 'auto'
+    tokenPattern: 'azpipelines'
+    writeBOM: true
+    actionOnMissing: 'warn'
+    keepToken: false
+    actionOnNoFiles: 'continue'
+    enableTransforms: false
+    useLegacyPattern: false
+    enableTelemetry: false
+    
+- task: replacetokens@4
+  displayName: Replacing tokenized values
+  inputs:
+    rootDirectory: '$(System.ArtifactsDirectory)'
+    targetFiles: '**/*.release.py => *.py'
+    encoding: 'auto'
+    tokenPattern: 'azpipelines'
+    writeBOM: true
+    actionOnMissing: 'fail'
+    keepToken: false
+    actionOnNoFiles: 'continue'
+    enableTransforms: false
+    useLegacyPattern: false
+    emptyValue: '(EMPT_VARIABLE)'
+    enableTelemetry: true
+
+- task: replacetokens@3
+  displayName: Replacing tokenized values
+  inputs:
+    rootDirectory: '$(System.ArtifactsDirectory)'
+    targetFiles: |
+      **/*.release.py => *.py
+    encoding: 'auto'
+    writeBOM: true
+    actionOnMissing: 'fail'
+    keepToken: false
+    tokenPrefix: '__'
+    tokenSuffix: '__'
+    useLegacyPattern: false
+    emptyValue: '(EMPT_VARIABLE)'
+    enableTelemetry: true    
