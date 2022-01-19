@@ -43,7 +43,7 @@ stages:
     displayName: 'Development deploy'
     dependsOn: build
     variables:
-      databricksWorkspaceName: databricks-quickstart-dev
+      databricksWorkspaceName: databricks-demo-dev
     jobs: 
     - deployment: DeployToDevelopment
       environment: development 
@@ -73,67 +73,67 @@ stages:
                   deploymentMode: 'Incremental'
                   deploymentOutputs: 'ArmOutputs'
   
-  - stage: 'uat'
-    displayName: 'UAT deploy'
-    dependsOn: development
-    variables:
-      databricksWorkspaceName: databricks-quickstart-uat
-    jobs: 
-    - deployment: DeployToUAT
-      environment: uat 
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-              - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
-                inputs:
-                  source: 'current'
-                  path: '$(Pipeline.Workspace)'
+  # - stage: 'uat'
+  #   displayName: 'UAT deploy'
+  #   dependsOn: development
+  #   variables:
+  #     databricksWorkspaceName: databricks-quickstart-uat
+  #   jobs: 
+  #   - deployment: DeployToUAT
+  #     environment: uat 
+  #     strategy:
+  #       runOnce:
+  #         deploy:
+  #           steps:
+  #             - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+  #               inputs:
+  #                 source: 'current'
+  #                 path: '$(Pipeline.Workspace)'
 
-              - task: AzureResourceManagerTemplateDeployment@3
-                displayName: Creating ADF Infrastructure by IaC
-                inputs:
-                  deploymentScope: 'Resource Group'
-                  azureResourceManagerConnection: '$(serviceConnection)'
-                  subscriptionId: '$(subscriptionId)'
-                  action: 'Create Or Update Resource Group'
-                  resourceGroupName: 'RG-Databricks'
-                  location: 'northeurope'
-                  templateLocation: 'Linked artifact'
-                  csmFile: '$(Pipeline.Workspace)/databricks/infrastructure/databricks.json'
-                  overrideParameters: -databricksWorkspaceName $(databricksWorkspaceName)
-                  deploymentMode: 'Incremental'
-                  deploymentOutputs: 'ArmOutputs'          
+  #             - task: AzureResourceManagerTemplateDeployment@3
+  #               displayName: Creating ADF Infrastructure by IaC
+  #               inputs:
+  #                 deploymentScope: 'Resource Group'
+  #                 azureResourceManagerConnection: '$(serviceConnection)'
+  #                 subscriptionId: '$(subscriptionId)'
+  #                 action: 'Create Or Update Resource Group'
+  #                 resourceGroupName: 'RG-Databricks'
+  #                 location: 'northeurope'
+  #                 templateLocation: 'Linked artifact'
+  #                 csmFile: '$(Pipeline.Workspace)/databricks/infrastructure/databricks.json'
+  #                 overrideParameters: -databricksWorkspaceName $(databricksWorkspaceName)
+  #                 deploymentMode: 'Incremental'
+  #                 deploymentOutputs: 'ArmOutputs'          
 
-  - stage: 'prd'
-    displayName: 'Production deploy'
-    dependsOn: uat
-    variables:
-      databricksWorkspaceName: databricks-quickstart-prd
-    jobs: 
-    - deployment: DeployToProduction
-      environment: production 
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-              - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
-                inputs:
-                  source: 'current'
-                  path: '$(Pipeline.Workspace)'
+  # - stage: 'prd'
+  #   displayName: 'Production deploy'
+  #   dependsOn: uat
+  #   variables:
+  #     databricksWorkspaceName: databricks-quickstart-prd
+  #   jobs: 
+  #   - deployment: DeployToProduction
+  #     environment: production 
+  #     strategy:
+  #       runOnce:
+  #         deploy:
+  #           steps:
+  #             - task: DownloadPipelineArtifact@2 #downloading artifacts created in build stage
+  #               inputs:
+  #                 source: 'current'
+  #                 path: '$(Pipeline.Workspace)'
 
-              - task: AzureResourceManagerTemplateDeployment@3
-                displayName: Creating ADF Infrastructure by IaC
-                inputs:
-                  deploymentScope: 'Resource Group'
-                  azureResourceManagerConnection: '$(serviceConnection)'
-                  subscriptionId: '$(subscriptionId)'
-                  action: 'Create Or Update Resource Group'
-                  resourceGroupName: 'RG-Databricks'
-                  location: 'northeurope'
-                  templateLocation: 'Linked artifact'
-                  csmFile: '$(Pipeline.Workspace)/databricks/infrastructure/databricks.json'
-                  overrideParameters: -databricksWorkspaceName $(databricksWorkspaceName)
-                  deploymentMode: 'Incremental'
-                  deploymentOutputs: 'ArmOutputs'  
+  #             - task: AzureResourceManagerTemplateDeployment@3
+  #               displayName: Creating ADF Infrastructure by IaC
+  #               inputs:
+  #                 deploymentScope: 'Resource Group'
+  #                 azureResourceManagerConnection: '$(serviceConnection)'
+  #                 subscriptionId: '$(subscriptionId)'
+  #                 action: 'Create Or Update Resource Group'
+  #                 resourceGroupName: 'RG-Databricks'
+  #                 location: 'northeurope'
+  #                 templateLocation: 'Linked artifact'
+  #                 csmFile: '$(Pipeline.Workspace)/databricks/infrastructure/databricks.json'
+  #                 overrideParameters: -databricksWorkspaceName $(databricksWorkspaceName)
+  #                 deploymentMode: 'Incremental'
+  #                 deploymentOutputs: 'ArmOutputs'  
   
