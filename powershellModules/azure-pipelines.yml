@@ -1,0 +1,62 @@
+parameters:
+  - name: version
+    type: string
+    default: 0.0.1
+
+jobs:
+  - job:
+    displayName: Powershell Modules - Build Job
+    variables:
+      - name: version
+        value: ${{ parameters.version }}
+    
+    steps:
+  
+      - checkout: self
+      
+      - task: replacetokens@4
+        displayName: Replacing tokenized values
+        inputs:
+          rootDirectory: $(Pipeline.Workspace)
+          targetFiles: |
+            **/*.psd1
+            **/*.nuspec
+          encoding: auto
+          tokenPattern: azpipelines
+          writeBOM: true
+          actionOnMissing: warn
+          keepToken: false
+          actionOnNoFiles: continue
+          enableTransforms: false
+          useLegacyPattern: false
+          enableTelemetry: false
+          verbosity: 'detailed'
+          
+      - task: NuGetCommand@2
+        inputs:
+          command: 'pack'
+          packagesToPack: '**/Example.Module.nuspec'
+          packDestination: '$(build.artifactstagingdirectory)'
+
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(build.artifactstagingdirectory)'
+          artifact: ${{ parameters.resource.runName }}
+          publishLocation: 'pipeline'
+
+  - deployment: ${{ replace(parameters.resource.runName,'-','') }}iac
+    displayName: Powershell Modules Deployment
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+
+            # Push a project
+            - task: NuGetCommand@2
+              inputs:
+                command: 'push'
+                packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;!$(Pipeline.Workspace)/**/*.symbols.nupkg'
+                nuGetFeedType: 'internal'
+                publishVstsFeed: 'devopsnights'
+                allowPackageConflicts: true
